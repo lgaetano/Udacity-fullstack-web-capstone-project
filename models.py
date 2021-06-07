@@ -19,15 +19,16 @@ def setup_db(app, database_path=database_path):
 
 
 '''
-Person
-Have title and release year
+Provider: name, insurance type, state, and phone
 '''
-class Person(db.Model):  
-  __tablename__ = 'People'
+class Provider(db.Model):  
+  __tablename__ = 'Provider'
 
   id = Column(Integer, primary_key=True)
-  name = Column(String)
-  catchphrase = Column(String)
+  name = Column(String, nullable=False)
+  insurance = Column(String, nullable=False)
+  state = Column(String, nullable=False)
+  phone = Column(String, nullable=False)
 
   def __init__(self, name, catchphrase=""):
     self.name = name
@@ -37,4 +38,7 @@ class Person(db.Model):
     return {
       'id': self.id,
       'name': self.name,
-      'catchphrase': self.catchphrase}
+      'insurance': self.insurance,
+      'state': self.state,
+      'phone': self.state
+      }
