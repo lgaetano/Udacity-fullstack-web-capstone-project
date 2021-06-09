@@ -26,9 +26,9 @@ def create_app(test_config=None):
     except Exception:
       abort(404)
           
-  @app.route('/coolkids')
-  def be_cool():
-      return "Be cool, man, be coooool! You're almost a FSND grad!"
+  # @app.route('/coolkids')
+  # def be_cool():
+  #     return "Be cool, man, be coooool! You're almost a FSND grad!"
 
   return app
 
