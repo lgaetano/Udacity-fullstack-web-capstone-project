@@ -1,5 +1,6 @@
 import os
-from sqlalchemy import create_engine
+from sqlalchemy import Column, String, Integer, ForeignKey, \
+  create_engine
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import json
@@ -29,15 +30,15 @@ Provider:
 class Provider(db.Model):  
   __tablename__ = 'providers'
 
-  id = db.Column(db.Integer, primary_key=True)
-  name = db.Column(db.String(120), nullable=False)
-  state = db.Column(db.String(120), nullable=False)
-  patients = db.relationship('Patient', backref="provider", lazy=True)
+  id = Column(Integer, primary_key=True)
+  name = Column(String(120), nullable=False)
+  state = Column(String(120), nullable=False)
+  patients = relationship('Patient', backref="provider", lazy=True)
 
   def __init__(self, name, state):
     self.name = name
     self.state = state
-    self.patients = patients
+    # self.patients = patients
 
   def insert(self):
     db.session.add(self)
@@ -65,11 +66,11 @@ Patient:
 class Patient(db.Model):  
   __tablename__ = 'patients'
 
-  id = db.db.Integer, primary_key=True)
-  name = db.Column(db.String(120), nullable=False)
-  age = db.Column(db.Integer, nullable=False)
-  state = db.Column(db.String(120), nullable=False)
-  provider_id = db.Column(db.Integer, db.ForeignKey('providers.id'), nullable=False)
+  id = Column(Integer, primary_key=True)
+  name = Column(String(120), nullable=False)
+  age = Column(Integer, nullable=False)
+  state = Column(String(120), nullable=False)
+  provider_id = Column(Integer, ForeignKey('providers.id'), nullable=False)
 
   def __init__(self, name, age, state, provider_id):
     self.name = name
