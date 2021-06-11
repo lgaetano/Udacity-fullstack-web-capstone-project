@@ -1,11 +1,12 @@
 # import os
 # from _typeshed import NoneType
-from flask import Flask, request, abort, jsonify
 # from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request, abort, jsonify
 from flask_cors import CORS
-from models import setup_db, Provider, Patient
-# from auth import AuthError, requires_auth
 import json
+
+from database.models import setup_db, Provider, Patient
+from auth.auth import AuthError, requires_auth
 
 def create_app(test_config=None):
   # create and configure the app
@@ -31,7 +32,7 @@ def create_app(test_config=None):
     })
 
   @app.route('/patients', methods=['GET'])
-  # @requires_auth('get:patients')
+  @requires_auth('get:patients')
   def get_patients(token):
     ''' Retrieve all patients. '''
 
@@ -49,7 +50,7 @@ def create_app(test_config=None):
       abort(404)
           
   @app.route('/patients', methods=['POST'])
-  # @requires_auth('post:patients')
+  @requires_auth('post:patients')
   def add_patient(token):
     ''' Create new patient record. '''
     
@@ -91,7 +92,7 @@ def create_app(test_config=None):
     }), 200
 
   @app.route('/providers', methods=['GET'])
-  # @requires_auth('get:providers')
+  @requires_auth('get:providers')
   def get_providers(token):
     ''' Retrieve all providers. '''
 
@@ -109,7 +110,7 @@ def create_app(test_config=None):
       abort(404)
           
   @app.route('/providers', methods=['POST'])
-  # @requires_auth('post:providers')
+  @requires_auth('post:providers')
   def add_provider(token):
     ''' Create new provider record. '''
     
@@ -147,6 +148,29 @@ def create_app(test_config=None):
     return jsonify({
       "success": True
     }), 200
+
+
+  @app.route('/patients/<patient:patient_id>', methods=['DELETE'])
+  @requires_auth('delete:patients')
+  def delete_patient(token, patient_id):
+    ''' Delete individual patient. '''
+
+    patient = Patient.query.filter(Patient.id == patient_id).one_or_none()
+
+    # If no patient matches, abort
+    if Patient is None:
+      abort(404, "No patient with id " + str(patient_id) + " found.")
+    try:
+      #Delete patient record
+      patient.delete()
+             
+      return jsonify({
+        "success": True,
+        "deleted": patient_id,
+      }), 200
+
+    except Exception:
+      abort(404)
 
   return app
 
