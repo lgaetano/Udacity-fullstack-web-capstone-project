@@ -3,9 +3,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
-# import json
-
-# database_path = os.environ['DATABASE_URL']
 database_path = os.environ.get('DATABASE_URL')
 
 db = SQLAlchemy()
@@ -68,7 +65,7 @@ class Patient(db.Model):
   age = db.Column(db.Integer, nullable=False)
   provider_id = db.Column(db.Integer, db.ForeignKey('providers.id'), nullable=False)
 
-  def __init__(self, name, age, state, provider_id):
+  def __init__(self, name, age, provider_id):
     self.name = name
     self.age = age
     self.provider_id = provider_id
