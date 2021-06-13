@@ -109,7 +109,7 @@ def create_app(test_config=None):
 
   @app.route('/patients/<int:id>', methods=['PATCH'])
   @requires_auth('patch:patients')
-  def add_patient(token, id):
+  def update_patient(token, id):
     ''' Update patient record. '''
     
     # Query for record
@@ -147,23 +147,23 @@ def create_app(test_config=None):
       "success": True
     }), 200
           
-  @app.route('/patients/<patient:patient_id>', methods=['DELETE'])
+  @app.route('/patients/<int:id>', methods=['DELETE'])
   @requires_auth('delete:patients')
-  def delete_patient(token, patient_id):
+  def delete_patient(token, id):
     ''' Delete individual patient. '''
 
-    patient = Patient.query.filter(Patient.id == patient_id).one_or_none()
+    patient = Patient.query.filter(Patient.id == id).one_or_none()
 
     # If no patient matches, abort
     if Patient is None:
-      abort(404, "No patient with id " + str(patient_id) + " found.")
+      abort(404, "No patient with id " + str(id) + " found.")
     try:
       #Delete patient record
       patient.delete()
              
       return jsonify({
         "success": True,
-        "deleted": patient_id,
+        "deleted": id,
       }), 200
 
     except Exception:
@@ -172,6 +172,57 @@ def create_app(test_config=None):
   return app
 
 app = create_app()
+
+# Error Handling
+
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({
+        "success": False,
+        "error": 400,
+        "message": "bad request"
+    }), 400
+
+@app.errorhandler(403)
+def forbidden(error):
+    return jsonify({
+        "success": False,
+        "error": 403,
+        "message": "forbidden"
+    }), 403
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        "success": False,
+        "error": 404,
+        "message": "not found"
+    }), 404
+
+@app.errorhandler(422)
+def unprocessable(error):
+    return jsonify({
+        "success": False,
+        "error": 422,
+        "message": "unprocessable"
+    }), 422
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    return jsonify({
+        "success": False,
+        "error": 500,
+        "message": "internal server error"
+    }),  500
+
+@app.errorhandler(AuthError)
+def authentication_failed(error):
+    return jsonify({
+        "success": False,
+        "error": error.status_code,
+        "message": error.error['code']
+    }), error.status_code
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
