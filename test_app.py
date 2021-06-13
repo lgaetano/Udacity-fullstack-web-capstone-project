@@ -14,35 +14,33 @@ class CapstoneTestCase(unittest.TestCase):
         self.database_path = "postgresql://{}".format(self.database_name)
         setup_db(self.app, self.database_path)
 
+        self.agent_headers = {
+            "Content-Type": "application/json",
+            "Authorization":  os.environ.get('INSURANCE_AGENT')
+        }
+
+        self.manager_headers = {
+            "Content-Type": "application/json",
+            "Authorization":  os.environ.get('INSURANCE_MANAGER')
+        }
+
+        self.new_patient = {
+            "name": "Jahn Doe",
+            "age": 48,
+            "provider_id": 1,
+        }
+
+        self.new_provider = {
+            "name": "Dr. Jekyll",
+            "patients": [1, 2]
+        }
+
         # Bind app to current context
         with self.app.app.context():
             self.db = SQLAlchemy()
             self.db.init_app(self.app)
             # Create tables
             self.db.create_all()
-
-        self.patient = {
-            "name": "Jahn Doe",
-            "age": 48,
-            "provider_id": 1,
-        }
-
-        self.provider = {
-            "name": "Dr. Jekyll",
-            "patients": [1, 2]
-        }
-
-        #TODO
-        # Authentication tokens information
-        with open('auth_config.json', 'r') as f:
-            self.auth = json.loads(f.read())
-
-        role_1 = self.auth["roles"]["Role 1"]["jwt_token"]
-        role_2 = self.auth["roles"]["Role 2"]["jwt_token"]
-        self.auth_headers = {
-            "Role 1": f'Bearer {role_1}',
-            "Role 2": f'Bearer {role_2}',
-        }
 
     def tearDown(self):
         ''' Executed after each test run. '''
@@ -53,7 +51,8 @@ class CapstoneTestCase(unittest.TestCase):
     '''
     def test_get_providers(self):
         header_obj = {
-            "Authorization": self.auth_headers["Role 1"]
+            "Authorization": "Bearer {}".
+                                format(self.agent_headers)
         }
         res = self.client().get('/providers', headers=header_obj)
         data = json.loads(res.data)
@@ -61,7 +60,7 @@ class CapstoneTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['success'])
     
-    def test_get_provider_error(self):
+    def test_401_get_provider_error(self):
         res = self.client().get('/providers')
         data = json.loads(res.data)
 
@@ -74,7 +73,8 @@ class CapstoneTestCase(unittest.TestCase):
     '''
     def test_get_patients(self):
         header_obj = {
-            "Authorization": self.auth_headers["Role 1"]
+            "Authorization": "Bearer {}".
+                                format(self.agent_headers)
         }
         res = self.client().get('/patients', headers=header_obj)
         data = json.loads(res.data)
@@ -82,7 +82,7 @@ class CapstoneTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['success'])
 
-    def test_get_patient_error(self):
+    def test_401_get_patient_error(self):
         res = self.client().get('/patients')
         data = json.loads(res.data)
 
@@ -93,15 +93,97 @@ class CapstoneTestCase(unittest.TestCase):
     '''
     Test POST Patients
     '''
-    # def test_post_patients(self):
+    def test_create_new_patient(self):
+        header_obj = {
+            "Authorization": "Bearer {}".
+                                format(self.agent_headers)
+        }
+        res = self.client().post('/patients', 
+                                json=self.new_patient, 
+                                headers=header_obj)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'])
+
+    def test_401_create_new_patient(self):
+        res = self.client().post('/patients', json=self.new_patient)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertFalse(data["success"])
+        self.assertEqual(data["message"], "Unauthorized Error")
 
     '''
     Test PATCH Patients
     '''
-    # def test_patch_patients(self):
+    def test_patch_patients(self):
+        header_obj = {
+            "Authorization": "Bearer {}".
+                                format(self.manager_headers)
+        }
+
+        # Add entry to database
+        self.client().post('/patients', json=self.new_patient,
+                           headers=header_obj)
+
+        res = self.client().patch(
+            'patients/2', json={'age': 342},
+            headers=header_obj
+        )
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data["success"])
+
+    def test_404_patch_patients(self):
+        header_obj = {
+            "Authorization": "Bearer {}".
+                                format(self.manager_headers)
+        }
+
+        res = self.client().patch(
+            'patients/200', json={'age': 342},
+            headers=header_obj
+        )
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertFalse(data["success"])
+        self.assertEqual(data["message"], "Resource Not Found")
 
     '''
     Test DELETE Patients
     '''
-    # def test_delete_patients(self):
+    def test_delete_patients(self):
+        header_obj = {
+            "Authorization": "Bearer {}".
+                                format(self.manager_headers)
+        }
+        
+        # Add entry to database
+        self.client().post('/patients', json=self.new_patient,
+                           headers=header_obj)
 
+        res = self.client().delete('/patients/3', 
+                                headers=header_obj)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'])
+
+    def test_404_delete_patients(self):
+        header_obj = {
+            "Authorization": "Bearer {}".
+                                format(self.manager_headers)
+        }
+
+        res = self.client().delete('/patients/42', 
+                                headers=header_obj)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertFalse(data['success'])
+        self.assertEqual(data["message"], "Resource Not Found")
