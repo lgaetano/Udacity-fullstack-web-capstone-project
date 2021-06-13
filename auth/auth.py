@@ -4,11 +4,11 @@ from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
 
-from env import auth0_domain, algorithm, api_audience
+# from auth.env import auth0_domain, algorithm, api_audience
 
-AUTH0_DOMAIN = auth0_domain
-ALGORITHMS = algorithm
-API_AUDIENCE = api_audience
+AUTH0_DOMAIN = "lgaetano.us.auth0.com"
+ALGORITHMS = ["RS256"]
+API_AUDIENCE = "capstone"
 
 ## AuthError Exception
 '''

@@ -1,8 +1,8 @@
 from flask import Flask, request, abort, jsonify
 from flask_cors import CORS
 
-from database.models import setup_db, Provider, Patient
-from auth.auth import AuthError, requires_auth
+from .database.models import setup_db, Provider, Patient
+from .auth.auth import AuthError, requires_auth
 
 def create_app(test_config=None):
   # create and configure the app
