@@ -14,16 +14,6 @@ class CapstoneTestCase(unittest.TestCase):
         self.database_path = "postgresql://{}".format(self.database_name)
         setup_db(self.app, self.database_path)
 
-        self.agent_headers = {
-            "Content-Type": "application/json",
-            "Authorization":  os.environ.get('INSURANCE_AGENT')
-        }
-
-        self.manager_headers = {
-            "Content-Type": "application/json",
-            "Authorization":  os.environ.get('INSURANCE_MANAGER')
-        }
-
         self.new_patient = {
             "name": "Jahn Doe",
             "age": 48,
@@ -33,6 +23,17 @@ class CapstoneTestCase(unittest.TestCase):
         self.new_provider = {
             "name": "Dr. Jekyll",
             "patients": [1, 2]
+        }
+
+        # Set up authentication tokens
+        with open('auth_config.json', 'r') as f:
+            self.auth = json.loads(f.read())
+
+        ins_agent_jwt = self.auth["roles"]["Insurance Agent"]["jwt_token"]
+        ins_manager_jwt = self.auth["roles"]["Insurance Manager"]["jwt_token"]
+        self.auth_headers = {
+            "Insurance Agent": f'Bearer {ins_agent_jwt}',
+            "Insurance Manager": f'Bearer {ins_manager_jwt}'
         }
 
         # Bind app to current context
@@ -51,9 +52,8 @@ class CapstoneTestCase(unittest.TestCase):
     '''
     def test_get_providers(self):
         header_obj = {
-            "Authorization": "Bearer {}".
-                                format(self.agent_headers)
-        }
+            "Authorization": self.auth_headers["Insurance Agent"]
+            }
         res = self.client().get('/providers', headers=header_obj)
         data = json.loads(res.data)
 
@@ -73,9 +73,9 @@ class CapstoneTestCase(unittest.TestCase):
     '''
     def test_get_patients(self):
         header_obj = {
-            "Authorization": "Bearer {}".
-                                format(self.agent_headers)
+            "Authorization": self.auth_headers["Insurance Agent"]
         }
+
         res = self.client().get('/patients', headers=header_obj)
         data = json.loads(res.data)
 
@@ -95,9 +95,9 @@ class CapstoneTestCase(unittest.TestCase):
     '''
     def test_create_new_patient(self):
         header_obj = {
-            "Authorization": "Bearer {}".
-                                format(self.agent_headers)
+            "Authorization": self.auth_headers["Insurance Agent"]
         }
+
         res = self.client().post('/patients', 
                                 json=self.new_patient, 
                                 headers=header_obj)
@@ -119,8 +119,7 @@ class CapstoneTestCase(unittest.TestCase):
     '''
     def test_patch_patients(self):
         header_obj = {
-            "Authorization": "Bearer {}".
-                                format(self.manager_headers)
+            "Authorization": self.auth_headers["Insurance Manager"]
         }
 
         # Add entry to database
@@ -139,8 +138,7 @@ class CapstoneTestCase(unittest.TestCase):
 
     def test_404_patch_patients(self):
         header_obj = {
-            "Authorization": "Bearer {}".
-                                format(self.manager_headers)
+            "Authorization": self.auth_headers["Insurance Manager"]
         }
 
         res = self.client().patch(
@@ -159,8 +157,7 @@ class CapstoneTestCase(unittest.TestCase):
     '''
     def test_delete_patients(self):
         header_obj = {
-            "Authorization": "Bearer {}".
-                                format(self.manager_headers)
+            "Authorization": self.auth_headers["Insurance Manager"]
         }
         
         # Add entry to database
@@ -176,8 +173,7 @@ class CapstoneTestCase(unittest.TestCase):
 
     def test_404_delete_patients(self):
         header_obj = {
-            "Authorization": "Bearer {}".
-                                format(self.manager_headers)
+            "Authorization": self.auth_headers["Insurance Manager"]
         }
 
         res = self.client().delete('/patients/42', 
