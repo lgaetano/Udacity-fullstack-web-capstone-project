@@ -140,3 +140,15 @@ Auth0 is set up and running. The following configurations are in a .env file whi
 - The Auth0 Domain Name
 - The Auth0 Client ID
 The JWT token contains the permissions for the 'Insurance Manager' and 'Insurance Agent' roles.
+
+## Roles:
+
+### Insurance Agent
+
+- Can view patients and providers
+- Add patients
+
+### Insurance Manager
+
+- All permissions an Insurance Agent has and…
+- Modify or delete an patient from the database
