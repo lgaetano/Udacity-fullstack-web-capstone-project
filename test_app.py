@@ -17,7 +17,7 @@ class CapstoneTestCase(unittest.TestCase):
         self.new_patient = {
             "name": "Jahn Doe",
             "age": 48,
-            "provider_id": 1,
+            "provider_id": 1
         }
 
         self.new_provider = {
