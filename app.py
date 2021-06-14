@@ -100,8 +100,7 @@ def create_app(test_config=None):
       #Insert new patient record
       patient.insert()
 
-    except Exception as e:
-      print(e)
+    except Exception:
       abort(400)
     
     return jsonify({
