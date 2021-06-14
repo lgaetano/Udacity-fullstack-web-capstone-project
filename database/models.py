@@ -1,5 +1,3 @@
-# from sqlalchemy import Column, String, Integer, ForeignKey, \
-  # create_engine
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
@@ -33,7 +31,6 @@ class Provider(db.Model):
 
   def __init__(self, name, state):
     self.name = name
-    # self.patients = patients
 
   def insert(self):
     db.session.add(self)
