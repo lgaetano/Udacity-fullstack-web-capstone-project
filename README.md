@@ -56,6 +56,7 @@ https://TODO
 #### GET '/patients'
 Returns a list of all available patients, patient detail, total number of patients and a success value.
 Returns via Postman:
+```
 {
     "patients": [
         {
@@ -80,10 +81,12 @@ Returns via Postman:
     "success": True,
     "total_patients": 3
 }
+```
 
 #### GET '/providers'
 Returns a list of all available providers, provider detail, total number of providers and a success value.
 Returns via Postman:
+```
 {
     "providers": [
         {
@@ -100,39 +103,50 @@ Returns via Postman:
     "success": True,
     "total_providers": 1
 }
+```
 
 #### POST '/patients'
 Enter via Postman:
+```
 {
 	"name": "Adele",
 	"age": 55,
     "provider_id": 2
 }
+```
 Returns via Postman:
+```
 {
     "success": True
 }
+```
 
 #### PATCH '/patients/{id}'
 Returns a success value. If the patient is not found,returns 404 Error.
 Enter via Postman:
+```
 {
 	"name": "Karina",
 	"age": 65, 
     "provider_id": 1
 }
+```
 Returns via Postman:
+```
 {
     "success": True
 }
+```
 
 #### DELETE '/patients/{id}'
 Return the patient id that was deleted and success value.
 Returns via Postman:
+```
 {
         "success": True,
         "deleted": 2,
 }
+```
 
 ## THIRD-PARTY AUTHENTICATION
 #### auth.py
