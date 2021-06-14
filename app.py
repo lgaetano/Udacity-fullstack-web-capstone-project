@@ -56,7 +56,7 @@ def create_app(test_config=None):
       
       return jsonify({
         "success": True,
-        "patients": provider_detail,
+        "providers": provider_detail,
         "total_providers": len(Provider.query.all()),
       }), 200
 
@@ -100,7 +100,8 @@ def create_app(test_config=None):
       #Insert new patient record
       patient.insert()
 
-    except Exception:
+    except Exception as e:
+      print(e)
       abort(400)
     
     return jsonify({
@@ -117,7 +118,7 @@ def create_app(test_config=None):
 
     # If no data, abort
     if patient is None:
-      abort(404, "No patient with id " + {id} + " found.")
+      abort(404, "No patient with this id found.")
 
     try:
       # Get data from body
