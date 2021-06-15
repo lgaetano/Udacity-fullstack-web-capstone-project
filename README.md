@@ -43,14 +43,25 @@ or
 FLASK_APP=app.py flask run
 ```
 We can now also open the application via Heroku using the URL:
-https://TODO
+https://lgaetano-udacity-fsnd-capstone.herokuapp.com/
 
 
 ## API DOCUMENTATION
 ### Endpoint Library
 
+### Testing Authentication
+A token is required for each endpoint. 
+The token can be retrived by following these steps:
+1. Go to https: https://lgaetano.us.auth0.com/authorize?audience=capstone&response_type=token&client_id=EaVEF4JM1fPpgtg3qg82ECj5cGnhMh0p&redirect_uri=https://127.0.0.1:8080/capstone
+2. Click on Login and enter the below email addresses and passwords to get all permisions for 'Insurance Agent':
+	Email: lgaetano19@gmail.com
+	Password: 123456ABc!
+3. for 'Insurance Manager':
+	Email: liagaetano19@gmail.com
+	Password: 123456ABc!
+
 #### base URL:
-https://TODO
+https://lgaetano-udacity-fsnd-capstone.herokuapp.com/
 
 
 #### GET '/patients'
